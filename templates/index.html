@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoCalc — Calculadora de Figuras Geométricas</title>
+  <meta name="description" content="Calculadora geométrica con backend en Python y Flask. Área, perímetro y volumen de figuras 2D y 3D.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav__contenedor">
+      <div class="nav__logo">
+        <span class="nav__icono">◈</span>
+        Geo<span>Calc</span>
+      </div>
+      <div class="nav__meta">
+        <span class="nav__badge">Python 3.13</span>
+        <span class="nav__badge">Flask 3.1</span>
+        <span class="nav__badge">Backend API</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="contenedor">
+      <span class="hero__label">Calculadora geométrica · Backend en Python</span>
+      <h1>Figuras<br><em>Geométricas</em></h1>
+      <p>Selecciona una figura, ingresa sus medidas y Python calcula área, perímetro y volumen en tiempo real a través de una API REST.</p>
+    </div>
+  </section>
+
+  <!-- CALCULADORA -->
+  <section class="seccion" id="calculadora">
+    <div class="contenedor">
+      <div class="calc__layout">
+
+        <!-- PANEL IZQUIERDO — Selector y formulario -->
+        <div class="calc__panel">
+
+          <!-- Selector de figura -->
+          <div class="panel__seccion">
+            <h2 class="panel__titulo">Selecciona una figura</h2>
+            <div class="figuras__grid">
+
+              <button class="figura__btn activo" data-figura="circulo">
+                <span class="figura__icono">⬤</span>
+                <span>Círculo</span>
+              </button>
+
+              <button class="figura__btn" data-figura="rectangulo">
+                <span class="figura__icono">▬</span>
+                <span>Rectángulo</span>
+              </button>
+
+              <button class="figura__btn" data-figura="triangulo">
+                <span class="figura__icono">▲</span>
+                <span>Triángulo</span>
+              </button>
+
+              <button class="figura__btn" data-figura="hexagono">
+                <span class="figura__icono">⬡</span>
+                <span>Hexágono</span>
+              </button>
+
+              <button class="figura__btn" data-figura="cilindro">
+                <span class="figura__icono">⬭</span>
+                <span>Cilindro</span>
+              </button>
+
+              <button class="figura__btn" data-figura="esfera">
+                <span class="figura__icono">●</span>
+                <span>Esfera</span>
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Formulario dinámico -->
+          <div class="panel__seccion">
+            <h2 class="panel__titulo">Ingresa las medidas</h2>
+            <div class="form__campos" id="campos">
+              <!-- Se genera dinámicamente con JS -->
+            </div>
+            <button class="btn btn--calcular" id="btnCalcular">
+              Calcular con Python →
+            </button>
+          </div>
+
+          <!-- Info técnica -->
+          <div class="panel__seccion panel__seccion--codigo">
+            <h2 class="panel__titulo">Request enviado</h2>
+            <pre class="codigo__bloque" id="requestPreview">{
+  "figura": "circulo",
+  "radio": 5
+}</pre>
+          </div>
+
+        </div>
+
+        <!-- PANEL DERECHO — Resultados -->
+        <div class="calc__resultado" id="resultado">
+
+          <!-- Estado inicial -->
+          <div class="resultado__inicial" id="estadoInicial">
+            <div class="resultado__placeholder">
+              <span class="placeholder__icono">◈</span>
+              <p>Ingresa los datos y haz clic en<br><strong>Calcular con Python</strong></p>
+              <span class="placeholder__sub">El servidor Python procesará los cálculos y retornará los resultados vía API REST</span>
+            </div>
+          </div>
+
+          <!-- Resultados reales -->
+          <div class="resultado__contenido" id="resultadoContenido" style="display:none">
+
+            <div class="resultado__header">
+              <span class="resultado__icono" id="resIcono">⬤</span>
+              <div>
+                <h2 class="resultado__nombre" id="resNombre">Círculo</h2>
+                <span class="resultado__tipo" id="resTipo"></span>
+              </div>
+            </div>
+
+            <!-- Visualización SVG -->
+            <div class="svg__contenedor">
+              <svg id="figuraSVG" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+              </svg>
+            </div>
+
+            <!-- Métricas principales -->
+            <div class="metricas__grid" id="metricasGrid">
+            </div>
+
+            <!-- Parámetros -->
+            <div class="parametros__seccion">
+              <h3>Parámetros ingresados</h3>
+              <div class="parametros__lista" id="parametrosLista">
+              </div>
+            </div>
+
+            <!-- Fórmulas -->
+            <div class="formulas__seccion">
+              <h3>Fórmulas aplicadas</h3>
+              <div class="formulas__lista" id="formulasLista">
+              </div>
+            </div>
+
+            <!-- Response del servidor -->
+            <div class="panel__seccion--codigo">
+              <h3 class="panel__titulo">Response del servidor</h3>
+              <pre class="codigo__bloque" id="responsePreview"></pre>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="seccion seccion--oscura">
+    <div class="contenedor">
+      <h2 class="seccion__titulo">¿Cómo funciona?</h2>
+      <div class="flujo__grid">
+
+        <div class="flujo__paso">
+          <span class="flujo__numero">01</span>
+          <h3>Frontend — JavaScript</h3>
+          <p>El usuario selecciona una figura e ingresa medidas. JavaScript construye un objeto JSON y lo envía al servidor vía fetch API.</p>
+          <code>fetch('/calcular', { method: 'POST' })</code>
+        </div>
+
+        <div class="flujo__arrow">→</div>
+
+        <div class="flujo__paso">
+          <span class="flujo__numero">02</span>
+          <h3>Backend — Python Flask</h3>
+          <p>Flask recibe el request, instancia la clase correspondiente y ejecuta los métodos de cálculo con precisión matemática.</p>
+          <code>Circulo(radio).info()</code>
+        </div>
+
+        <div class="flujo__arrow">→</div>
+
+        <div class="flujo__paso">
+          <span class="flujo__numero">03</span>
+          <h3>Response — JSON API</h3>
+          <p>Python retorna los resultados en formato JSON. JavaScript los recibe y actualiza la interfaz dinámicamente.</p>
+          <code>jsonify(resultado)</code>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>GeoCalc · Construido con <strong>Python 3.13 + Flask</strong> por <strong>Tomás Gil Gómez</strong></p>
+    <p class="footer__sub">Backend API REST · Frontend HTML/CSS/JS · Medellín, Colombia 2025</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
